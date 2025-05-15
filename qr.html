@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Advanced QR Code Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --text: #333;
+      --card: #fff;
+      --border: #ccc;
+      --btn-bg: #0d6efd;
+      --btn-hover: #0b5ed7;
+      --select-bg: #fff;
+    }
+    [data-theme="dark"] {
+      --bg: #1e1e2f;
+      --text: #fff;
+      --card: #2b2b40;
+      --border: #444;
+      --btn-bg: #0d6efd;
+      --btn-hover: #2563eb;
+      --select-bg: #2b2b40;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .main-card {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .dark-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text);
+      transition: background-color 0.3s ease;
+    }
+    .dark-toggle:hover {
+      background-color: var(--btn-bg);
+      color: #fff;
+    }
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      margin-bottom: 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--select-bg);
+      color: var(--text);
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--btn-bg);
+    }
+    button.generate-btn {
+      background-color: var(--btn-bg);
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+    button.generate-btn:hover {
+      background-color: var(--btn-hover);
+    }
+    .qr-code-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 250px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .format-options {
+      display: none;
+      gap: 10px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    .format-options button {
+      flex: 1;
+      background-color: var(--btn-bg);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .format-options button:hover {
+      background-color: var(--btn-hover);
+    }
+    .developer {
+      margin-top: 20px;
+      font-size: 11px;
+      opacity: 0.5;
+      user-select: none;
+    }
+    @media (max-width: 480px) {
+      .main-card {
+        padding: 20px;
+      }
+      h2 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-card">
+    <div class="dark-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">🌙</div>
+    <h2>QR Generator</h2>
+    <input type="text" id="qrText" placeholder="Enter text or URL" />
+    <select id="qrStyle">
+      <option value="square">Square</option>
+      <option value="dots">Dots</option>
+      <option value="rounded">Rounded</option>
+      <option value="extra-rounded">Extra Rounded</option>
+    </select>
+    <select id="qrSize">
+      <option value="200">200 x 200</option>
+      <option value="250" selected>250 x 250</option>
+      <option value="300">300 x 300</option>
+    </select>
+    <button class="generate-btn" onclick="generateQRCode()">Generate QR</button>
+
+    <div class="qr-code-wrapper" id="qr-code"></div>
+
+    <div class="format-options" id="formatOptions">
+      <button onclick="downloadQR('png')">PNG</button>
+      <button onclick="downloadQR('svg')">SVG</button>
+      <button onclick="downloadQR('jpeg')">JPG</button>
+    </div>
+
+    <div class="developer">Developed by: Luxon Corp</div>
+  </div>
+
+  <script>
+    let qrCode = null;
+
+    function generateQRCode() {
+      const text = document.getElementById("qrText").value.trim();
+      const style = document.getElementById("qrStyle").value;
+      const size = parseInt(document.getElementById("qrSize").value);
+
+      if (!text) {
+        alert("Please enter text or URL");
+        return;
+      }
+
+      if (qrCode) {
+        document.getElementById("qr-code").innerHTML = "";
+      }
+
+      qrCode = new QRCodeStyling({
+        width: size,
+        height: size,
+        data: text,
+        dotsOptions: {
+          type: style,
+          color: "#000"
+        },
+        backgroundOptions: {
+          color: "#ffffff"
+        }
+      });
+
+      qrCode.append(document.getElementById("qr-code"));
+
+      document.getElementById("formatOptions").style.display = "flex";
+    }
+
+    function downloadQR(format) {
+      if (!qrCode) {
+        alert("Generate a QR code first");
+        return;
+      }
+      qrCode.download({ name: "qr-code", extension: format });
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute("data-theme");
+      html.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+    }
+
+    document.getElementById("qrSize").addEventListener("change", () => {
+      if (document.getElementById("qrText").value.trim()) {
+        generateQRCode();
+      }
+    });
+
+    document.getElementById("qrStyle").addEventListener("change", () => {
+      if (document.getElementById("qrText").value.trim()) {
+        generateQRCode();
+      }
+    });
+  </script>
+</body>
+</html>
