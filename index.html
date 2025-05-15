@@ -223,17 +223,7 @@
       html.setAttribute("data-theme", current === "dark" ? "light" : "dark");
     }
 
-    document.getElementById("qrSize").addEventListener("change", () => {
-      if (document.getElementById("qrText").value.trim()) {
-        generateQRCode();
-      }
-    });
-
-    document.getElementById("qrStyle").addEventListener("change", () => {
-      if (document.getElementById("qrText").value.trim()) {
-        generateQRCode();
-      }
-    });
+    // Removed automatic QR generation on dropdown change
   </script>
 </body>
 </html>
